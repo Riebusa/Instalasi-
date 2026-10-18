@@ -1,0 +1,75 @@
+1. 	wsl --install
+2. 	cd backend > cp .env.example .env
+3. 	composer install/update
+4. 	docker compose up -d --build
+5. 	docker exec -it laravel-api php artisan key:generate
+6. 	docker exec -it laravel-api composer require Laravel/sanctum
+7. 	docker exec -it laravel-api composer require barryvdh/laravel-dompdf
+8.	docker exec -it laravel-api php artisan install:api
+9.	docker exec -it Laravel-api php artisan migrate --seed
+10.	sudo chown -R ilham_ma:ilham_ma /home/ilham_ma/01.Projek-API
+
+Docker-Compose.yml
+service:
+	mysql-server:
+		image: MySQL:8.0
+		container_name: MySQL-API
+		environment: 
+			MYSQL_DATABASE: API_Ujikom
+			MYSQL_USER: api_ujikom
+			MYSQL_PASSWORD: api_ujikom
+			MYSQL_ROOT_PASSWORD: passwordroot
+		ports: 
+			- "3606:3606"
+		networks:
+			- API_UJIKOM
+		volumes:
+			- db_data:/var/lib/MySQL
+
+	app-Laravel:
+		build:
+			context: ./backend
+			dockerfile: Dockerfile
+		container_name: laravel-api
+		working_dir: /var/www
+		ports:
+			- "8000:8000"
+		volumes: 
+			- ./backend:/var/www
+		command: sh -c "php artisan storage:link; php artisan serve --host=0.0.0.0 --ports=8000"
+		depends_on:
+			- mysql-server
+		networks:
+			- API-UJIKOM
+
+	scheduler:
+		build:
+			context: ./backend
+			dockerfile: Dockerfile
+		container_name: laravel-scheduler
+		working_dir: /var/www
+		volumes:
+			- ./backend:/vaar/www
+		command: php artisan schedule:work
+		depends_on:
+			- MySQL-server
+		networks:
+			- API-UJIKOM
+
+	phpMyadmin:
+		image: phpMyAdmin
+		container_name: PhpMyadmin-API
+		environment: 
+			PMA_HOST: myql-server
+		ports: 
+			- "8081:80"
+		depends_on: 
+			- mysql-server
+		networks:
+			- API-UJIKOM
+
+	volumes: 
+		db_data:
+	networks:
+		- API-UJIKOM:
+			driver: bridge

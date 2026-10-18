@@ -1,0 +1,42 @@
+1. Setiting docker wsl 2 & ubuntu, WSL Install
+2. Connect WSL In VSCode
+3. Copy/Create .env from .env.example
+4. Create Key Generate
+5. Docker compose up
+6. Install Laravel Sanctum
+7. Install Baryyvdh/laravel-dompdf
+8. Install database/API
+9. Migrate database & seeder
+
+- Install WSL
+wsl --install
+
+- Deriktori Ubuntu/WSL
+\\wsl$
+
+- Connect WSL VSCode
+Click >< Connect to wsl using distro
+
+- Install Laravel
+docker run --rm -u "$(id -u):$(id -g)" -v "${PWD}:/app" -w /app composer create-project laravel/laravel:^12 backend
+
+- Compose Up
+docker compose up -d --build
+
+- Install Sanctum
+docker exec -it laravel-api composer require Laravel/sanctum
+
+- Install Ekosistem API
+docker exec -it Laravel-api php artisan install:api
+
+- Install Libary
+docker exec -it laravel-api composer require barryvdh/laravel-dompdf
+
+- Hubungkan Storage
+docker exec -it laravel-api php artisan storage:link
+
+- Key Generate
+docker exec -it laravel-api php artisan key:generate
+
+- Migrate
+docker exec -it laravel-api php artisan migrate --seed
